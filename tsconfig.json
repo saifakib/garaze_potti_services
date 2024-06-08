@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -16,6 +18,20 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*":[ "./src/*", "./prisma/*"],
+      "loki-logger":["./src/packages/loki-logger"],
+      "paginator":["./src/packages/paginator/src"],
+    }
+  },
+  "include": ["./src", "./prisma", "packages/**/*"],
+  "exclude": ["node_modules"],
 }
