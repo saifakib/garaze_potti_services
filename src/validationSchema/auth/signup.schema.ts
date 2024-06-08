@@ -10,7 +10,7 @@ export const signUpSchema = extendApi(
       mobile: z.string().regex(bdPhoneRegex, 'Invalid phone number!').optional(),
       userType: z.enum(['END_USER', 'SERVICE_PROVIDER']),
       password: z.string(),
-      signUpMethod: z.enum(['EMAIL', 'MOBILE', 'GUEST']),
+      signUpMethod: z.enum(['EMAIL', 'MOBILE']),
     })
     .superRefine((data, ctx) => {
       const { userType, email, mobile } = data;
@@ -44,14 +44,6 @@ export const signUpSchema = extendApi(
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Mobile number should be provided',
-          fatal: true,
-        });
-        return z.NEVER;
-      }
-      if (data.signUpMethod == 'GUEST' && email == undefined && data.mobile == undefined) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'For guest no need to provide email or mobile number',
           fatal: true,
         });
         return z.NEVER;

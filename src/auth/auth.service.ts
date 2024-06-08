@@ -25,45 +25,29 @@ export class AuthService {
     try {
       const role = await this.isRoleExist(userType);
 
-      let createUser: any;
-      if (signUpMethod == 'GUEST') {
-        createUser = await this.userRepository.create({
-          userId: this._generateUserUniqueId(),
-          password: hashSync(randomCode(6), 10),
-          userType: userType,
-          badge: Badge.FLYING,
-          profile: { create: {} },
-          role: {
-            connect: {
-              uuid: role.uuid,
-            },
-          },
-        });
-      } else {
-        // Check for existing user based on signup method
-        const searchCriteria = signUpMethod === 'EMAIL' ? { email } : { mobile };
-        const isUserExits = await this.userRepository.findOne(searchCriteria);
-        if (isUserExits) {
-          throw new HttpException('User already exits!!', HttpStatus.BAD_REQUEST);
-        }
-
-        // Create user with appropriate properties
-        createUser = await this.userRepository.create({
-          userId: this._generateUserUniqueId(),
-          ...(email && { email }),
-          ...(mobile && { mobile }),
-          password: hashSync(password, 10),
-          userType: userType,
-          badge: Badge.REGISTERED,
-          signupMethod: signUpMethod === 'EMAIL' ? SIGNUP_METHOD.EMAIL : SIGNUP_METHOD.MOBILE,
-          profile: { create: {} },
-          role: {
-            connect: {
-              uuid: role.uuid,
-            },
-          },
-        });
+      // Check for existing user based on signup method
+      const searchCriteria = signUpMethod === 'EMAIL' ? { email } : { mobile };
+      const isUserExits = await this.userRepository.findOne(searchCriteria);
+      if (isUserExits) {
+        throw new HttpException('User already exits!!', HttpStatus.BAD_REQUEST);
       }
+
+      // Create user with appropriate properties
+      const createUser: any = await this.userRepository.create({
+        userId: this._generateUserUniqueId(),
+        ...(email && { email }),
+        ...(mobile && { mobile }),
+        password: hashSync(password, 10),
+        userType: userType,
+        badge: Badge.FLYING,
+        signupMethod: signUpMethod === 'EMAIL' ? SIGNUP_METHOD.EMAIL : SIGNUP_METHOD.MOBILE,
+        profile: { create: {} },
+        role: {
+          connect: {
+            uuid: role.uuid,
+          },
+        },
+      });
       const { accessToken, refreshToken } = await this.getTokens(createUser);
 
       delete createUser.password;
@@ -80,9 +64,9 @@ export class AuthService {
   }
 
   async login(data: LoginDto) {
-    const { email, mobile, userId, password } = data;
+    const { email, mobile, password } = data;
     try {
-      const searchCriteria = email ? { email } : mobile ? { mobile } : { userId: userId };
+      const searchCriteria = email ? { email } : { mobile };
       const user = await this.userRepository.findOne(searchCriteria);
       if (!user) {
         throw new HttpException('Invalid Credentials!!', HttpStatus.BAD_REQUEST);
