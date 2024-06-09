@@ -23,6 +23,7 @@ enum UserType {
 }
 
 enum Badge {
+  FLYING
   REGISTERED
   VERIFIED
 }
@@ -106,7 +107,6 @@ model Otps {
   uuid      String   @unique @default(uuid()) @db.Uuid
   userUuid  String   @db.Uuid
   otp       String   @db.VarChar(15)
-  expireIn  Int
   secret    String   @db.VarChar(100)
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   user      Users    @relation(fields: [userUuid], references: [uuid])

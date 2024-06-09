@@ -7,6 +7,7 @@ import { randomCode } from '@/utils/random-code.util';
 import { Badge, Roles, SIGNUP_METHOD, UserType } from '@prisma/client';
 import { Config } from '@/config/env.config';
 import { RolesRepository } from '@/access-control/roles/roles.repository';
+import { OtpService } from '@/notifications/otp/otp.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
     private readonly rolesRepository: RolesRepository,
+    private readonly otpService: OtpService,
   ) {}
 
   _generateUserUniqueId(): string {
@@ -34,7 +36,6 @@ export class AuthService {
 
       // Create user with appropriate properties
       const createUser: any = await this.userRepository.create({
-        userId: this._generateUserUniqueId(),
         ...(email && { email }),
         ...(mobile && { mobile }),
         password: hashSync(password, 10),
@@ -51,6 +52,7 @@ export class AuthService {
       const { accessToken, refreshToken } = await this.getTokens(createUser);
 
       delete createUser.password;
+      await this.otpService.sendOtp(createUser.uuid, 'EMAIL', email, mobile);
       return {
         user: createUser,
         tokens: {

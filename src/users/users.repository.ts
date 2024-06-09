@@ -15,7 +15,6 @@ export class UserRepository {
         where: where,
         select: {
           uuid: true,
-          userId: true,
           userType: true,
           badge: true,
           password: true,
@@ -79,7 +78,6 @@ export class UserRepository {
         data,
         select: {
           uuid: true,
-          userId: true,
           userType: true,
           badge: true,
           password: true,
