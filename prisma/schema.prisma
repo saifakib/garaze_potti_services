@@ -45,7 +45,6 @@ model Users {
   uuid           String         @unique @default(uuid()) @db.Uuid
   email          String?        @unique
   mobile         String?        @unique
-  userId         String?
   password       String?
   userType       UserType
   badge          Badge?
@@ -57,6 +56,7 @@ model Users {
   profile        Profile?
   role           Roles?         @relation(fields: [roleUuid], references: [uuid])
   roleUuid       String?        @db.Uuid
+  Otps           Otps[]
 }
 
 model Profile {
@@ -100,4 +100,14 @@ model Permissions {
   updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
   updatedBy   String?   @db.Uuid
   roles       Roles[]
+}
+
+model Otps {
+  id        Int      @id @unique @default(autoincrement())
+  uuid      String   @unique @default(uuid()) @db.Uuid
+  userUuid  String   @db.Uuid
+  otp       String   @db.VarChar(15)
+  secret    String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  user      Users    @relation(fields: [userUuid], references: [uuid])
 }

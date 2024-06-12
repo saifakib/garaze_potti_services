@@ -28,7 +28,6 @@
     "resolveJsonModule": true,
     "paths": {
       "@/*":[ "./src/*", "./prisma/*"],
-      "loki-logger":["./src/packages/loki-logger"],
       "paginator":["./src/packages/paginator/src"],
     }
   },
