@@ -5,10 +5,109 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  ROOT_ADMIN
+  SUPER_ADMIN
+  ADMIN
+  END_USER
+  SERVICE_PROVIDER
+}
+
+enum Badge {
+  FLYING
+  REGISTERED
+  VERIFIED
+}
+
+enum SIGNUP_METHOD {
+  MOBILE
+  EMAIL
+  OTHER
+}
+
+enum GENDER {
+  MEN
+  WOMEN
+  OTHER
+}
+
+model Users {
+  id             Int            @id @default(autoincrement())
+  uuid           String         @unique @default(uuid()) @db.Uuid
+  email          String?        @unique
+  mobile         String?        @unique
+  password       String?
+  userType       UserType
+  badge          Badge?
+  isVerified     Boolean        @default(false)
+  isRegistered   Boolean        @default(false)
+  emailVerified  Boolean        @default(false)
+  mobileVerified Boolean        @default(false)
+  signupMethod   SIGNUP_METHOD?
+  profile        Profile?
+  role           Roles?         @relation(fields: [roleUuid], references: [uuid])
+  roleUuid       String?        @db.Uuid
+  Otps           Otps[]
+}
+
+model Profile {
+  uuid      String    @unique @default(uuid()) @db.Uuid
+  firstName String?   @db.VarChar(100)
+  lastName  String?   @db.VarChar(100)
+  address   String?   @db.VarChar(255)
+  gender    GENDER?
+  dob       DateTime?
+  image     String?
+  user      Users     @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
+  userUuid  String    @unique @db.Uuid
+}
+
+model Roles {
+  id          Int           @id @unique @default(autoincrement())
+  uuid        String        @unique @default(uuid()) @db.Uuid
+  name        String        @unique @db.VarChar(100)
+  slug        String        @unique @db.VarChar(100)
+  description String?       @db.VarChar(100)
+  systemRole  Boolean       @default(false)
+  softDelete  Boolean       @default(false)
+  createdAt   DateTime      @default(now()) @db.Timestamptz(6)
+  createdBy   String?       @db.Uuid
+  updatedAt   DateTime?     @updatedAt @db.Timestamptz(6)
+  updatedBy   String?       @db.Uuid
+  users       Users[]
+  permissions Permissions[]
+}
+
+model Permissions {
+  id          Int       @id @unique @default(autoincrement())
+  uuid        String    @unique @default(uuid()) @db.Uuid
+  name        String    @unique @db.VarChar(100)
+  slug        String    @unique @db.VarChar(100)
+  description String?   @db.VarChar(250)
+  group       String?   @db.VarChar
+  softDelete  Boolean   @default(false)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  createdBy   String?   @db.Uuid
+  updatedAt   DateTime? @updatedAt @db.Timestamptz(6)
+  updatedBy   String?   @db.Uuid
+  roles       Roles[]
+}
+
+model Otps {
+  id        Int      @id @unique @default(autoincrement())
+  uuid      String   @unique @default(uuid()) @db.Uuid
+  userUuid  String   @db.Uuid
+  otp       String   @db.VarChar(15)
+  secret    String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  user      Users    @relation(fields: [userUuid], references: [uuid])
 }
