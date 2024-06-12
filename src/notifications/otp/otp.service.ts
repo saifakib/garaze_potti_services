@@ -51,7 +51,7 @@ export class OtpService {
         case 'EMAIL':
           this.mailService.sendEmail(emailData);
           break;
-        case 'PHONE':
+        case 'MOBILE':
           this.smsService.sendSms(smsData);
           break;
         case 'BOTH':

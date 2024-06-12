@@ -49,16 +49,16 @@ export class AuthService {
           },
         },
       });
-      const { accessToken, refreshToken } = await this.getTokens(createUser);
-
+      //const { accessToken, refreshToken } = await this.getTokens(createUser);
       delete createUser.password;
-      await this.otpService.sendOtp(createUser.uuid, 'EMAIL', email, mobile);
+      delete createUser.role;
+      await this.otpService.sendOtp(createUser.uuid, signUpMethod, email, mobile);
       return {
         user: createUser,
-        tokens: {
-          accessToken,
-          refreshToken,
-        },
+        // tokens: {
+        //   accessToken,
+        //   refreshToken,
+        // },
       };
     } catch (err) {
       throw err;

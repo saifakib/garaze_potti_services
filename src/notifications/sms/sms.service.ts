@@ -12,12 +12,13 @@ export class SmsService {
       const bodyData: any = {
         UserName: `${SMS_USERNAME}`,
         Apikey: `${SMS_API_KEY}`,
-        MobileNumber: sendSmsData.phone,
+        MobileNumber: sendSmsData.mobile,
         CampaignId: 'null',
         SenderName: `${SMS_FROM}`,
         TransactionType: 'T',
         Message: sendSmsData.text,
       };
+      console.log(bodyData);
       const response = await sendRequest(SMS_SEND_API_URL, {
         method: 'POST',
         body: JSON.stringify(bodyData),
